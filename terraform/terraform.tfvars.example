@@ -1,0 +1,36 @@
+# Example Terraform variables file
+# Copy this file to terraform.tfvars and modify as needed
+
+# Application Settings
+environment         = "development"  # development, production, staging, test
+debug               = true
+log_level           = "DEBUG"       # DEBUG, INFO, WARNING, ERROR, CRITICAL
+
+# Security
+use_generated_secret = true          # Set to false to use your own secret key
+# secret_key         = "your-secret-key-here"  # Uncomment if use_generated_secret = false
+
+# Database Configuration
+postgres_user       = "postgres"
+use_generated_db_password = true    # Set to false to use your own password
+# postgres_password  = "your-postgres-password"  # Uncomment if use_generated_db_password = false
+postgres_db         = "septadb"
+postgres_host       = "postgres"    # Use 'localhost' for local development
+postgres_port       = 5432
+
+# Redis Configuration
+use_generated_redis_password = true  # Set to false to use your own password
+# redis_password     = "your-redis-password"  # Uncomment if use_generated_redis_password = false
+redis_host          = "redis"       # Use 'localhost' for local development
+redis_port          = 6379
+
+# Docker Configuration
+docker_username     = "yourusername"
+docker_password     = "yourpassword"  # Consider using environment variables
+compose_bake        = true
+docker_buildkit     = 1
+watchfiles_polling  = true
+docker_debug        = 1
+
+# Output configuration
+output_path         = ".."         # Path where to create the .env file
