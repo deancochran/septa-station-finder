@@ -5,9 +5,13 @@ from geopandas import GeoDataFrame
 import numpy as np
 from sklearn.neighbors import BallTree
 from sqlmodel import SQLModel
+import geopy.geocoders
 from geopy.geocoders import Nominatim
 
-geolocator = Nominatim(user_agent="SEPTA_Regional_Rail_Station_Finder_API")
+# GEOPY Nominatim Docs: https://geopy.readthedocs.io/en/stable/#geopy.geocoders.options.default_timeout
+geopy.geocoders.options.default_user_agent = 'SEPTA_Station_Finder_API'
+geopy.geocoders.options.default_timeout = 10
+geolocator = Nominatim()
 _data :Dict[str, GeoDataFrame] = {}  # Use private variable
 _tree: BallTree = None  # Use private variable
 
@@ -49,27 +53,29 @@ def get_walking_directions(start_lat: float, start_lon: float, end_lat: float, e
 
     url = f"http://router.project-osrm.org/route/v1/foot/{start_lon},{start_lat};{end_lon},{end_lat}?steps=true"
 
+    try:
+        response = requests.get(url)
+        data = response.json()
+        if data["code"] != "Ok":
+            return None
+        route = data["routes"][0]
+        # Process steps for readable directions
+        steps = []
+        for leg in route["legs"]:
+            for step in leg["steps"]:
+                if step['name'] == '':
+                    step['name'] = 'continue'
 
-    response = requests.get(url)
-    data = response.json()
-    if data["code"] != "Ok":
+                steps.append({"instruction": step['name'], "distance_meters": step['distance']})
+
+        return WalkingDirections(
+            distance=round(route["distance"] / 1000, 2),  # Convert to km
+            duration=round(route["duration"] / 60, 1),    # Convert to minutes
+            steps=steps
+        )
+    except Exception as e:
+        print(f"Error fetching walking directions: {e}")
         return None
-
-    route = data["routes"][0]
-    # Process steps for readable directions
-    steps = []
-    for leg in route["legs"]:
-        for step in leg["steps"]:
-            if step['name'] == '':
-                step['name'] = 'continue'
-
-            steps.append({"instruction": step['name'], "distance_meters": step['distance']})
-
-    return WalkingDirections(
-        distance=round(route["distance"] / 1000, 2),  # Convert to km
-        duration=round(route["duration"] / 60, 1),    # Convert to minutes
-        steps=steps
-    )
 
 
 def station_to_geojson(station_series):
