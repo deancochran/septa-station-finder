@@ -1,6 +1,7 @@
 from typing import Annotated, Optional
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import JSONResponse
+from fastapi.encoders import jsonable_encoder
 from pydantic import field_validator
 from redis import Redis
 from sqlmodel import SQLModel
@@ -44,7 +45,7 @@ async def all_stations(redis: Annotated[Redis, Depends(get_redis_client)]):
     else:
         septa_data = get_septa_data().to_json()
         redis.set("septa_data", septa_data)
-        return JSONResponse(content=septa_data)
+        return JSONResponse(content=jsonable_encoder(septa_data))
 
 
 @router.post("/find-nearest-station", response_model=StationResponse)
