@@ -131,18 +131,6 @@ variable "redis_port" {
 }
 
 # Docker Configuration
-variable "docker_username" {
-  description = "Docker Hub username"
-  type        = string
-  default     = ""
-}
-
-variable "docker_password" {
-  description = "Docker Hub password"
-  type        = string
-  default     = ""
-  sensitive   = true
-}
 
 variable "compose_bake" {
   description = "Enable Docker Compose bake feature"

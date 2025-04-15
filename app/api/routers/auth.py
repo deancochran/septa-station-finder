@@ -21,17 +21,17 @@ class Login(SQLModel):
 async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: Annotated[AsyncSession, Depends(get_database_client)]):
     """
     Authenticate a user and generate an access token.
-    
+
     This endpoint handles user authentication by verifying the provided username and password.
     If credentials are valid, it returns a JWT token for use in subsequent authenticated requests.
-    
+
     Parameters:
     - form_data: OAuth2 form containing username and password
     - db: Database session (automatically injected)
-    
+
     Returns:
     - Token: Object containing the JWT access token and token type
-    
+
     Raises:
     - 400 Error: If username doesn't exist or password is incorrect
     """
@@ -52,17 +52,17 @@ async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: 
 async def register(form_data: BaseUser, db: AsyncSession = Depends(get_database_client)):
     """
     Register a new user in the system.
-    
+
     This endpoint creates a new user account using the provided registration information.
     Upon successful registration, it returns a JWT token for immediate authentication.
-    
+
     Parameters:
     - form_data: BaseUser object containing registration details (username, password, etc.)
     - db: Database session (automatically injected)
-    
+
     Returns:
     - Token: Object containing the JWT access token and token type for the newly registered user
-    
+
     Raises:
     - HTTP exceptions may be raised during user creation if validation fails
     """

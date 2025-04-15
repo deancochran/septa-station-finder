@@ -69,8 +69,6 @@ resource "local_file" "env_file" {
     redis_port     = var.redis_port
 
     # Docker Configuration
-    docker_username    = var.docker_username
-    docker_password    = var.docker_password
     compose_bake       = var.compose_bake
     docker_buildkit    = var.docker_buildkit
     watchfiles_polling = var.watchfiles_polling
