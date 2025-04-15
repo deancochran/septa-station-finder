@@ -93,8 +93,7 @@ async def find_nearest_station(location: LocationInput, redis: Annotated[Redis, 
     cached_result = redis.get(cache_key)
     if cached_result:
         # Parse the JSON string from Redis to a Python object
-        from json import loads
-        return StationResponse.model_validate(loads(cached_result))
+        return StationResponse.model_validate(loads(cached_result)) # type: ignore
 
     # Find nearest station
     user_location = np.array([[latitude, longitude]])
