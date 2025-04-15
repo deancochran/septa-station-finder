@@ -10,6 +10,7 @@ from geopy.distance import geodesic
 import numpy as np
 from decimal import Decimal
 from typing import Any
+from json import loads
 
 # Define the center of SEPTA service area (Philadelphia City Hall coordinates)
 SEPTA_CENTER_LAT = 39.9526
@@ -108,7 +109,9 @@ async def find_nearest_station(location: LocationInput, redis: Annotated[Redis, 
     cache_key = f"septa_nearest_station_{location.latitude}_{location.longitude}"
     cached_result = redis.get(cache_key)
     if cached_result:
-        return cached_result
+        # Parse the JSON string from Redis to a Python object
+        from json import loads
+        return StationResponse.model_validate(loads(cached_result))
 
     # Find nearest station
     user_location = np.array([[location.latitude, location.longitude]])
