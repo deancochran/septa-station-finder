@@ -37,7 +37,7 @@ router = APIRouter(
     prefix="/septa", tags=["septa"], dependencies=[Depends(get_database_client), Depends(get_redis_client), Depends(authenticated_user)]
 )
 
-@router.post("/all-stations", response_model=JSONResponse)
+@router.post("/all-stations")
 async def all_stations(redis: Annotated[Redis, Depends(get_redis_client)]):
     cached_result = redis.get("septa_data")
     if cached_result:
