@@ -143,6 +143,8 @@ async def find_nearest_station(location: LocationInput, redis: Annotated[Redis, 
         geojson=station_geojson,
         walking_directions=walking_directions
     )
+    print('Your location', [latitude, longitude])
+    print('Nearest Station', [nearest_station.geometry.y, nearest_station.geometry.x])
 
     redis.set(cache_key, response.model_dump_json())
     return response
