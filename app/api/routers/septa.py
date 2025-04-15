@@ -1,5 +1,6 @@
 from typing import Annotated, Optional
-from fastapi import APIRouter, Depends, HTTPException, JSONResponse
+from fastapi import APIRouter, Depends, HTTPException
+from fastapi.responses import JSONResponse
 from pydantic import field_validator
 from redis import Redis
 from sqlmodel import SQLModel
