@@ -67,26 +67,15 @@ This project is a FastAPI-based API that finds the nearest SEPTA Regional Rail t
    cd septa-station-finder
    ```
 
-2. Install UV:
-   ```bash
-   curl -LsSf https://astral.sh/uv/install.sh | sh
-   ```
-2. Create and activate a virtual environment using UV:
-   ```bash
-   uv venv &&
-   source .venv/bin/activate
-   ```
-
-3. Install dependencies:
-   ```bash
-   uv add -r requirements.txt
-   ```
+> If you prefer to download the repository as a zip file, you can do so from the
+GitHub repository page. Unzip the folder in the directory of your choice and
+navigate to the root directory.
 
 ## Environment Variables Configuration
 
 The application requires a `.env` file for configuration. This file contains all the necessary environment variables for the application to run, including database credentials, security settings, and Docker configuration. You can set up this file for either local development or cloud deployment.
 
-### For Local Deployment
+### A: For Local Deployment
 
 For local development and testing, follow these steps to configure your environment:
 
@@ -153,7 +142,7 @@ WATCHFILES_FORCE_POLLING=true
 DEBUG=1
 ```
 
-### For Cloud Deployment
+### B: For Cloud Deployment
 
 For cloud deployments, Terraform provides an automated way to generate the `.env` file with secure random passwords and keys. This approach is recommended for production environments.
 
@@ -203,7 +192,7 @@ use_generated_db_password = true
 
 There are two main deployment options, locally and using the cloud. This can only be done once the proper environment variables have been collected to form a `.env` file
 
-### For Local Deployment
+### A: For Local Deployment
 
 Ensure that the Docker Daemon is running and is accessible. (Or use ensure that Docker Desktop is running and is accessible.)
 
@@ -233,7 +222,7 @@ docker compose exec api alembic downgrade -1
 docker compose exec api alembic upgrade +1`
 ```
 
-## For Cloud Deployment
+## B: For Cloud Deployment
 
 This approach uses AWS Elastic Container Service with Fargate for serverless container management:
 
@@ -280,3 +269,24 @@ aws ecs run-task \
   --network-configuration "awsvpcConfiguration={subnets=[$SUBNET_ID],securityGroups=[$SECURITY_GROUP_ID],assignPublicIp=ENABLED}" \
   --launch-type FARGATE
 ```
+
+
+## Development
+
+
+1. Install UV:
+   ```bash
+   curl -LsSf https://astral.sh/uv/install.sh | sh
+   ```
+2. Create and activate a virtual environment using UV:
+   ```bash
+   uv venv &&
+   source .venv/bin/activate
+   ```
+
+3. Install dependencies:
+   ```bash
+   uv add -r requirements.txt
+   ```
+
+4. Edit the App!
