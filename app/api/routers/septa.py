@@ -1,11 +1,12 @@
 from typing import Annotated, Optional
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, JSONResponse
 from pydantic import field_validator
 from redis import Redis
 from sqlmodel import SQLModel
 from app.api.dependencies import authenticated_user
 from app.core.config import get_database_client, get_redis_client
 from app.api.utils import WalkingDirections, get_septa_data, geolocator, get_walking_directions, get_tree, station_to_geojson
+from geopandas import GeoDataFrame
 from geopy.distance import geodesic
 import numpy as np
 from decimal import Decimal
@@ -34,17 +35,15 @@ router = APIRouter(
     prefix="/septa", tags=["septa"], dependencies=[Depends(get_database_client), Depends(get_redis_client), Depends(authenticated_user)]
 )
 
-@router.post("/all-stations")
-async def all_stations(location: LocationInput, redis: Annotated[Redis, Depends(get_redis_client)]):
-	# Check if result is cached in Redis
+@router.post("/all-stations", response_model=JSONResponse)
+async def all_stations(redis: Annotated[Redis, Depends(get_redis_client)]):
     cached_result = redis.get("septa_data")
     if cached_result:
-        # Parse the JSON string from Redis to a Python object
-        return StationResponse.model_validate(loads(cached_result)) # type: ignore
+        return JSONResponse(content=loads(cached_result)) # type: ignore
     else:
         septa_data = get_septa_data().to_json()
         redis.set("septa_data", septa_data)
-        return septa_data
+        return JSONResponse(content=septa_data)
 
 
 @router.post("/find-nearest-station", response_model=StationResponse)
