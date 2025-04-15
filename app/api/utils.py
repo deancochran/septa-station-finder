@@ -7,6 +7,7 @@ from sklearn.neighbors import BallTree
 from sqlmodel import SQLModel
 import geopy.geocoders
 from geopy.geocoders import Nominatim
+from decimal import Decimal
 
 # GEOPY Nominatim Docs: https://geopy.readthedocs.io/en/stable/#geopy.geocoders.options.default_timeout
 geopy.geocoders.options.default_user_agent = 'SEPTA_Station_Finder_API'
@@ -44,11 +45,11 @@ async def delete_septa_data():
     print("SEPTA data and tree cleared")
 
 class WalkingDirections(SQLModel):
-    distance: float
-    duration: float
+    distance: Decimal
+    duration: Decimal
     steps: list
 
-def get_walking_directions(start_lat: float, start_lon: float, end_lat: float, end_lon: float):
+def get_walking_directions(start_lat: Decimal, start_lon: Decimal, end_lat: Decimal, end_lon: Decimal):
     """Get walking directions using OpenStreetMap Routing Machine (OSRM)"""
 
     url = f"http://router.project-osrm.org/route/v1/foot/{start_lon},{start_lat};{end_lon},{end_lat}?steps=true"

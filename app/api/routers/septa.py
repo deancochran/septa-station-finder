@@ -45,7 +45,7 @@ router = APIRouter(
     prefix="/septa", tags=["septa"], dependencies=[Depends(get_database_client), Depends(get_redis_client), Depends(authenticated_user)]
 )
 
-@router.post("/find-nearest-station", response_model=StationResponse)
+@router.post("/find-nearest-station")
 async def find_nearest_station(location: LocationInput, redis: Annotated[Redis, Depends(get_redis_client)]):
     """
     Find the nearest SEPTA train station to a given location.
