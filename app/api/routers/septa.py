@@ -37,17 +37,6 @@ router = APIRouter(
     prefix="/septa", tags=["septa"], dependencies=[Depends(get_database_client), Depends(get_redis_client), Depends(authenticated_user)]
 )
 
-@router.post("/all-stations")
-async def all_stations(redis: Annotated[Redis, Depends(get_redis_client)]):
-    cached_result = redis.get("septa_data")
-    if cached_result:
-        return JSONResponse(content=loads(cached_result)) # type: ignore
-    else:
-        septa_data = get_septa_data().to_json()
-        redis.set("septa_data", septa_data)
-        return JSONResponse(content=jsonable_encoder(septa_data))
-
-
 @router.post("/find-nearest-station", response_model=StationResponse)
 async def find_nearest_station(location: LocationInput, redis: Annotated[Redis, Depends(get_redis_client)]):
     """
@@ -109,7 +98,7 @@ async def find_nearest_station(location: LocationInput, redis: Annotated[Redis, 
         # Parse the JSON string from Redis to a Python object
         print('Your location', [latitude, longitude])
         response = StationResponse.model_validate(loads(cached_result)) # type: ignore
-        print('Nearest Station', response['geometry'])
+        print('Nearest Station', response.geojson['geometry']['coordinates'])
         return response
 
     # Find nearest station

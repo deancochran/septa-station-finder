@@ -29,10 +29,10 @@ async def load_septa_data():
     _data['septa_data'] = gpd.read_file('data/SEPTARegionalRailStations2016/doc.kml', driver='KML')
     # Extract the coordinates for use in BallTree
 
-    coords = np.degrees(np.vstack([
+    coords = np.vstack([
         _data['septa_data'].geometry.y.to_numpy(),
         _data['septa_data'].geometry.x.to_numpy()
-    ]).T)
+    ]).T
 
     # Update the global tree variable
     _tree = BallTree(np.radians(coords), metric='haversine')
