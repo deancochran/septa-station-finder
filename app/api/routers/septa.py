@@ -22,20 +22,7 @@ MAX_SERVICE_RADIUS_KM = 80  # SEPTA Regional Rail extends ~40-50 miles from cent
 
 
 class LocationInput(SQLModel):
-    address: Optional[str] = None
-    latitude: Decimal = Decimal('0.0')
-    longitude: Decimal = Decimal('0.0')
-    @field_validator('latitude')
-    def validate_latitude(cls, v:Decimal):
-        if v is not None and (v < -90.0 or v > 90.0):
-            raise ValueError('Latitude must be between -90 and 90')
-        return v
-
-    @field_validator('longitude')
-    def validate_longitude(cls, v:Decimal):
-        if v is not None and (v < -180.0 or v > 180.0):
-            raise ValueError('Longitude must be between -180 and 180')
-        return v
+    address: str = "1400 John F Kennedy Blvd Philadelphia PA 19107"
 
 class StationResponse(SQLModel):
     station_name: str
@@ -72,21 +59,17 @@ async def find_nearest_station(location: LocationInput, redis: Annotated[Redis, 
     """
 
     # Input validation
-    if (location.latitude is None or location.longitude is None) and location.address is None:
-        raise HTTPException(status_code=400, detail="Either an address or latitude/longitude must be provided")
 
-    # If address is provided, geocode it
-    if location.address:
-        geo_result = geolocator.geocode(location.address)
-        if geo_result:
-            location.latitude = geo_result.latitude # type: ignore
-            location.longitude = geo_result.longitude # type: ignore
-        else:
-            raise HTTPException(status_code=400, detail="Could not geocode the provided address")
+    geo_result = geolocator.geocode(location.address)
+    if not geo_result:
+        raise HTTPException(status_code=400, detail="Could not geocode the provided address")
+
+    latitude = geo_result.latitude # type: ignore
+    longitude = geo_result.longitude # type: ignore
 
     # Check if location is within service area
     distance_to_center = geodesic(
-        (location.latitude, location.longitude),
+        (latitude, longitude),
         (SEPTA_CENTER_LAT, SEPTA_CENTER_LON)
     ).kilometers
 
@@ -106,7 +89,7 @@ async def find_nearest_station(location: LocationInput, redis: Annotated[Redis, 
         )
 
     # Check if result is cached in Redis
-    cache_key = f"septa_nearest_station_{location.latitude}_{location.longitude}"
+    cache_key = f"septa_nearest_station_{latitude}_{longitude}"
     cached_result = redis.get(cache_key)
     if cached_result:
         # Parse the JSON string from Redis to a Python object
@@ -114,7 +97,7 @@ async def find_nearest_station(location: LocationInput, redis: Annotated[Redis, 
         return StationResponse.model_validate(loads(cached_result))
 
     # Find nearest station
-    user_location = np.array([[location.latitude, location.longitude]])
+    user_location = np.array([[latitude, longitude]])
     user_location_rad = np.radians(user_location)
 
     # Query the tree for the nearest station
@@ -131,7 +114,7 @@ async def find_nearest_station(location: LocationInput, redis: Annotated[Redis, 
 
     # Get walking directions
     walking_directions = get_walking_directions(
-        location.latitude, location.longitude,
+        latitude, longitude,
         nearest_station.geometry.y, nearest_station.geometry.x
     )
 
