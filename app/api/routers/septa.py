@@ -8,6 +8,7 @@ from app.core.config import get_database_client, get_redis_client
 from app.api.utils import WalkingDirections, get_septa_data, geolocator, get_walking_directions, get_tree, station_to_geojson
 from geopy.distance import geodesic
 import numpy as np
+from decimal import Decimal
 
 # Define the center of SEPTA service area (Philadelphia City Hall coordinates)
 SEPTA_CENTER_LAT = 39.9526
@@ -20,17 +21,17 @@ MAX_SERVICE_RADIUS_KM = 80  # SEPTA Regional Rail extends ~40-50 miles from cent
 
 class LocationInput(SQLModel):
     address: Optional[str] = None
-    latitude: float = 0.0
-    longitude: float = 0.0
+    latitude: Decimal = Decimal('0.0')
+    longitude: Decimal = Decimal('0.0')
     @field_validator('latitude')
-    def validate_latitude(cls, v):
-        if v is not None and (v < -90 or v > 90):
+    def validate_latitude(cls, v:Decimal):
+        if v is not None and (v < -90.0 or v > 90.0):
             raise ValueError('Latitude must be between -90 and 90')
         return v
 
     @field_validator('longitude')
-    def validate_longitude(cls, v):
-        if v is not None and (v < -180 or v > 180):
+    def validate_longitude(cls, v:Decimal):
+        if v is not None and (v < -180.0 or v > 180.0):
             raise ValueError('Longitude must be between -180 and 180')
         return v
 
