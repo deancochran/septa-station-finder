@@ -272,8 +272,44 @@ aws ecs run-task \
 
 
 ## How to Use
+After you have deployed the application, you can access the API documentation by visiting the following URL:
+
+**For Local Deployment:** http://localhost:8000/docs
+
+**For AWS Deployment:** http://<ALB_DNS_NAME>/docs
+
+![API Documentation](./static/hompage.webp)
 
 
+You can view each API endpoint by clicking any endpoint dropdown menu.
+Then you can "Try Out" the endpoint by sending requests using the interactive UI.
+
+![API Endpoint Try Out](./static/tryout.webp)
+
+**Note: Some endpoints are secured with JWT authentication.**
+
+To send requests to endpoints that require authentication, you
+need to include a valid JWT token in the Authorization header
+of your request. Since the documentation page is generated using Swagger UI,
+you can also use the interactive UI to login and store your JWT token
+
+> To obtain a JWT token, you can use the `/auth/login` endpoint.
+Don't forget to submit a registration request!
+
+![API Auth](./static/auth.webp)
+
+![API Auth](./static/auth_submit.webp)
+![API Auth](./static/auth_complete.webp)
+
+Once you have obtained a JWT token, you can use it to
+authenticate your requests to secured endpoints.
+
+![API Auth](./static/auth_complete.webp)
+
+**You will notice that the 'unlocked' icon appearing next to authenticated
+endpoints is now locked, suggesting you are authenticated**
+
+Once this step is completed you can use any auth secured endpoint
 
 
 ## Development
