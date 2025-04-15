@@ -9,6 +9,7 @@ from app.api.utils import WalkingDirections, get_septa_data, geolocator, get_wal
 from geopy.distance import geodesic
 import numpy as np
 from decimal import Decimal
+from typing import Any
 
 # Define the center of SEPTA service area (Philadelphia City Hall coordinates)
 SEPTA_CENTER_LAT = 39.9526
@@ -37,15 +38,15 @@ class LocationInput(SQLModel):
 
 class StationResponse(SQLModel):
     station_name: str
-    distance_km: float
-    geojson: dict
+    distance_km: Decimal
+    geojson: Any
     walking_directions: Optional[WalkingDirections]
 
 router = APIRouter(
     prefix="/septa", tags=["septa"], dependencies=[Depends(get_database_client), Depends(get_redis_client), Depends(authenticated_user)]
 )
 
-@router.post("/find-nearest-station")
+@router.post("/find-nearest-station", response_model=StationResponse)
 async def find_nearest_station(location: LocationInput, redis: Annotated[Redis, Depends(get_redis_client)]):
     """
     Find the nearest SEPTA train station to a given location.
